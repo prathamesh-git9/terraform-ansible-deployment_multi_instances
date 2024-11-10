@@ -18,7 +18,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}  # Ensure this is referencing the correct region secret
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Remove existing Docker and containerd dependencies
         run: |
@@ -49,11 +49,9 @@ jobs:
 
       - name: Terraform Initialize
         run: |
-          cd terraform
           terraform init
 
       - name: Terraform Apply
         run: |
-          cd terraform
           terraform apply -auto-approve
 

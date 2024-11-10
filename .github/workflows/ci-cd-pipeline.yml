@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Set up AWS credentials for use in Terraform and Ansible
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -20,6 +22,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Remove existing Docker and containerd dependencies if any
       - name: Remove existing Docker and containerd dependencies
         run: |
           sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc containerd.io
@@ -30,35 +33,35 @@ jobs:
           sudo rm -rf /etc/docker
           sudo rm -rf /etc/containerd
 
+      # Install Docker using the official convenience script
       - name: Install Docker using the official convenience script
         run: |
           curl -fsSL https://get.docker.com -o get-docker.sh
           sudo sh get-docker.sh
 
+      # Verify Docker Installation
       - name: Verify Docker Installation
         run: sudo docker --version
 
+      # Set up Ansible inventory file
       - name: Set up Ansible inventory file
         run: |
-          echo "[all]" > inventory
-          echo "localhost ansible_connection=local" >> inventory
+          echo "[all]" > inventory.ini
+          echo "localhost ansible_connection=local" >> inventory.ini
 
-      - name: Run Terraform to get EC2 IP
+      # Initialize Terraform and apply configuration to provision EC2 instance
+      - name: Terraform Initialize and Apply
         run: |
-          cd terraform
           terraform init
           terraform apply -auto-approve
 
+      # Run the script to update inventory.ini with the new EC2 IP address
       - name: Update inventory.ini with the new EC2 IP
         run: |
           ./update_inventory.sh
 
+      # Run the Ansible playbook
       - name: Run Ansible playbook
         run: |
           ansible-playbook -i inventory.ini playbook.yml
-
-      - name: Terraform Apply
-        run: |
-          cd terraform
-          terraform apply -auto-approve
 

@@ -65,6 +65,6 @@ resource "aws_instance" "web" {
 }
 
 # Output the EC2 instance's public IP
-output "instance_ip" {
+output "ec2_public_ip" {
   value = aws_instance.web.public_ip
 }

@@ -75,7 +75,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      # Run the Ansible playbook
+      # Run the Ansible playbook with specified options to avoid deprecation warnings and specify backend
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory.ini playbook.yml
+          ansible-playbook -i inventory.ini playbook.yml -e "ansible_python_interpreter=/usr/bin/python3.7" -e "use_backend=dnf4"

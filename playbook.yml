@@ -3,12 +3,20 @@
   hosts: web
   become: yes
   tasks:
-    - name: Ensure Python `pip` is installed
-      yum:
-        name: python3-pip
+    - name: Ensure Python 3 and pip are installed
+      package:
+        name:
+          - python3
+          - python3-pip
         state: present
 
-    - name: Install specific versions of requests and urllib3
+    - name: Install Docker dependencies (optional for newer systems)
+      package:
+        name: python3-dnf
+        state: present
+      when: ansible_pkg_mgr == "dnf"
+
+    - name: Install specific versions of requests and urllib3 via pip
       pip:
         name:
           - requests==2.28.1   # Compatible with older urllib3
@@ -16,20 +24,20 @@
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      yum:
+      package:
         name: docker
         state: present
 
-    - name: Start Docker service
+    - name: Start and enable Docker service
       service:
         name: docker
         state: started
+        enabled: yes
 
-    - name: Ensure Nginx container is running
+    - name: Run Nginx container using Docker
       docker_container:
         name: nginx
         image: nginx
         state: started
         ports:
           - "80:80"
-

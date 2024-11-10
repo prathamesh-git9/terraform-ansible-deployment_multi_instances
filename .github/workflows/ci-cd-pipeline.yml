@@ -55,10 +55,18 @@ jobs:
           terraform init
           terraform apply -auto-approve
 
-      # Run the script to update inventory.ini with the new EC2 IP address
+      # Run the script to update inventory.ini with the new EC2 IP
       - name: Update inventory.ini with the new EC2 IP
         run: |
           ./update_inventory.sh
+
+      # Add EC2 instance to known_hosts to avoid SSH verification failure
+      - name: Add EC2 host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $(terraform output -raw ec2_public_ip) >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          chmod 644 ~/.ssh/known_hosts
 
       # Run the Ansible playbook
       - name: Run Ansible playbook

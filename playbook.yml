@@ -3,14 +3,34 @@
   hosts: web
   become: yes
   tasks:
-    - name: Ensure Python 3 and pip are installed
-      package:
-        name:
-          - python3
-          - python3-pip
-        state: present
+    - name: Ensure dnf is installed if required
+      block:
+        - name: Check if dnf is available
+          command: which dnf
+          register: dnf_check
+          ignore_errors: true
 
-    - name: Install specific versions of requests and urllib3 via pip
+        - name: Install dnf if not present
+          yum:
+            name: dnf
+            state: present
+          when: dnf_check.rc != 0
+
+    - name: Ensure Python3 and pip are installed
+      block:
+        - name: Install Python3 and pip using dnf
+          dnf:
+            name: python3-pip
+            state: present
+          when: dnf_check.rc == 0
+
+        - name: Install Python3 and pip using yum as fallback
+          yum:
+            name: python3-pip
+            state: present
+          when: dnf_check.rc != 0
+
+    - name: Install specific versions of requests and urllib3
       pip:
         name:
           - requests==2.28.1
@@ -18,17 +38,25 @@
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      package:
-        name: docker
-        state: present
+      block:
+        - name: Install Docker using dnf
+          dnf:
+            name: docker
+            state: present
+          when: dnf_check.rc == 0
 
-    - name: Start and enable Docker service
+        - name: Install Docker using yum as fallback
+          yum:
+            name: docker
+            state: present
+          when: dnf_check.rc != 0
+
+    - name: Start Docker service
       service:
         name: docker
         state: started
-        enabled: yes
 
-    - name: Run Nginx container using Docker
+    - name: Ensure Nginx container is running
       docker_container:
         name: nginx
         image: nginx

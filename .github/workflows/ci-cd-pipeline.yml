@@ -43,15 +43,22 @@ jobs:
           echo "[all]" > inventory
           echo "localhost ansible_connection=local" >> inventory
 
+      - name: Run Terraform to get EC2 IP
+        run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Update inventory.ini with the new EC2 IP
+        run: |
+          ./update_inventory.sh
+
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory playbook.yml
-
-      - name: Terraform Initialize
-        run: |
-          terraform init
+          ansible-playbook -i inventory.ini playbook.yml
 
       - name: Terraform Apply
         run: |
+          cd terraform
           terraform apply -auto-approve
 

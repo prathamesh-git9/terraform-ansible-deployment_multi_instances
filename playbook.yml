@@ -18,6 +18,26 @@
 
     - name: Ensure Python3 and pip are installed
       block:
+        - name: Ensure Python 3 and pip are installed
+          become: yes
+          apt:
+            name:
+              - python3
+              - python3-pip
+            state: present
+          when: ansible_facts['distribution'] == 'Ubuntu'
+
+
+        - name: Ensure Python 3 and pip are installed
+        become: yes
+        dnf:
+          name:
+            - python3
+            - python3-pip
+          state: present
+        when: ansible_facts['distribution'] == 'Fedora' or ansible_facts['distribution'] == 'CentOS'
+
+      
         - name: Install Python3 and pip using dnf
           dnf:
             name: python3-pip

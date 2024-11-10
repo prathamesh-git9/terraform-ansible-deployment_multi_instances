@@ -78,4 +78,4 @@ jobs:
       # Run the Ansible playbook with the correct Python interpreter and ensure the correct package manager
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory.ini playbook.yml -e "ansible_python_interpreter=/usr/bin/python3" -e "use_backend=yum"
+          ansible-playbook -i inventory.ini playbook.yml -e "ansible_python_interpreter=/usr/bin/python3" -e "use_backend=dnf5"

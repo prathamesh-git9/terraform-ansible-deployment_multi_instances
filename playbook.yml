@@ -3,79 +3,22 @@
   hosts: web
   become: yes
   tasks:
-    - name: Ensure dnf is installed if required
-      block:
-        - name: Check if dnf is available
-          command: which dnf
-          register: dnf_check
-          ignore_errors: true
-
-        - name: Install dnf if not present
-          yum:
-            name: dnf
-            state: present
-          when: dnf_check.rc != 0
-
-    - name: Ensure Python3 and pip are installed
-      block:
-        - name: Ensure Python 3 and pip are installed for Ubuntu
-          become: yes
-          apt:
-            name:
-              - python3
-              - python3-pip
-            state: present
-          when: ansible_facts['distribution'] == 'Ubuntu'
-
-        - name: Ensure Python 3 and pip are installed for Fedora or CentOS
-          become: yes
-          dnf:
-            name:
-              - python3
-              - python3-pip
-            state: present
-          when: ansible_facts['distribution'] in ['Fedora', 'CentOS']
-
-        - name: Install Python3 and pip using dnf if dnf is available
-          become: yes
-          dnf:
-            name:
-              - python3
-              - python3-pip
-            state: present
-          when: dnf_check.rc == 0
-
-        - name: Install Python3 and pip using yum as fallback if dnf is not available
-          become: yes
-          yum:
-            name:
-              - python3
-              - python3-pip
-            state: present
-          when: dnf_check.rc != 0
+    - name: Ensure Python `pip` is installed
+      yum:
+        name: python3-pip
+        state: present
 
     - name: Install specific versions of requests and urllib3
       pip:
         name:
-          - requests==2.28.1
-          - urllib3==1.26.5
+          - requests==2.28.1   # Compatible with older urllib3
+          - urllib3==1.26.5    # Compatible with OpenSSL 1.0.2k
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      block:
-        - name: Install Docker using dnf
-          become: yes
-          dnf:
-            name: docker
-            state: present
-          when: dnf_check.rc == 0
-
-        - name: Install Docker using yum as fallback
-          become: yes
-          yum:
-            name: docker
-            state: present
-          when: dnf_check.rc != 0
+      yum:
+        name: docker
+        state: present
 
     - name: Start Docker service
       service:
@@ -89,3 +32,4 @@
         state: started
         ports:
           - "80:80"
+

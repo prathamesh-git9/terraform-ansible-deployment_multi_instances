@@ -13,8 +13,8 @@
     - name: Install specific versions of requests and urllib3 via pip
       pip:
         name:
-          - requests==2.28.1   # Compatible with older urllib3
-          - urllib3==1.26.5    # Compatible with OpenSSL 1.0.2k
+          - requests==2.28.1
+          - urllib3==1.26.5
         executable: /usr/bin/pip3
 
     - name: Install Docker

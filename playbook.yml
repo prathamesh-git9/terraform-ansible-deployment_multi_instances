@@ -24,23 +24,12 @@
       service:
         name: docker
         state: started
-        enabled: yes
 
-    - name: Add ec2-user to docker group
-      user:
-        name: ec2-user
-        groups: docker
-        append: yes
-
-    - name: Pull Nginx Docker image
-      community.docker.docker_image:
-        name: nginx
-        source: pull
-
-    - name: Run Nginx container
-      community.docker.docker_container:
+    - name: Ensure Nginx container is running
+      docker_container:
         name: nginx
         image: nginx
         state: started
         ports:
           - "80:80"
+

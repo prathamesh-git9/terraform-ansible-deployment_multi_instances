@@ -43,9 +43,14 @@ jobs:
           echo "[all]" > inventory
           echo "localhost ansible_connection=local" >> inventory
 
+      - name: Decode and save EC2 private key
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/MyNewKeyPair2.pem
+          chmod 600 ~/.ssh/MyNewKeyPair2.pem
+
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory playbook.yml
+          ansible-playbook -i inventory playbook.yml --private-key ~/.ssh/MyNewKeyPair2.pem
 
       - name: Terraform Initialize
         run: |

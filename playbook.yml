@@ -10,12 +10,6 @@
           - python3-pip
         state: present
 
-    - name: Install Docker dependencies (optional for newer systems)
-      package:
-        name: python3-dnf
-        state: present
-      when: ansible_pkg_mgr == "dnf"
-
     - name: Install specific versions of requests and urllib3 via pip
       pip:
         name:

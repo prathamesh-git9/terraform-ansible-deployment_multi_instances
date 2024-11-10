@@ -1,1 +1,1 @@
-
+ssh-keyscan -H $(terraform output -raw ec2_public_ip) >> ~/.ssh/known_hosts

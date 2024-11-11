@@ -4,14 +4,13 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    use_backend: dnf4  # Set backend version
-    pkg_mgr: dnf4      # Explicitly specify the package manager
 
   tasks:
     - name: Ensure Python `pip` is installed
-      ansible.builtin.dnf:
+      ansible.builtin.apt:
         name: python3-pip
         state: present
+        update_cache: yes
 
     - name: Install specific versions of requests and urllib3
       ansible.builtin.pip:
@@ -21,14 +20,16 @@
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      ansible.builtin.dnf:
-        name: docker
+      ansible.builtin.apt:
+        name: docker.io
         state: present
+        update_cache: yes
 
     - name: Start Docker service
       ansible.builtin.service:
         name: docker
         state: started
+        enabled: true
 
     - name: Ensure Nginx container is running
       community.docker.docker_container:

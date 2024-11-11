@@ -4,34 +4,34 @@
   become: yes
   tasks:
     - name: Ensure yum is installed
-      ansible.builtin.package:
+      ansible.builtin.yum:
         name: yum
         state: present
 
     - name: Ensure Python `pip` is installed
-      yum:
+      ansible.builtin.yum:
         name: python3-pip
         state: present
 
     - name: Install specific versions of requests and urllib3
-      pip:
+      ansible.builtin.pip:
         name:
           - requests==2.28.1   # Compatible with older urllib3
           - urllib3==1.26.5    # Compatible with OpenSSL 1.0.2k
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      yum:
+      ansible.builtin.yum:
         name: docker
         state: present
 
     - name: Start Docker service
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
 
     - name: Ensure Nginx container is running
-      docker_container:
+      community.docker.docker_container:
         name: nginx
         image: nginx
         state: started

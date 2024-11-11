@@ -2,14 +2,13 @@
 - name: Set up Docker and Nginx container
   hosts: web
   become: yes
-  tasks:
-    - name: Ensure yum is installed
-      ansible.builtin.yum:
-        name: yum
-        state: present
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    use_backend: dnf  # Explicitly specify the backend to use
 
+  tasks:
     - name: Ensure Python `pip` is installed
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: python3-pip
         state: present
 
@@ -21,7 +20,7 @@
         executable: /usr/bin/pip3
 
     - name: Install Docker
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: docker
         state: present
 

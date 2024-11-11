@@ -4,22 +4,21 @@ provider "aws" {
 
 # Define a security group allowing HTTP traffic on port 80 and SSH traffic on port 22
 resource "aws_security_group" "allow_web_traffic" {
-  count       = 1  # You can adjust this number to create multiple security groups.
-  name        = "allow_web_traffic-${timestamp()}"  # Use timestamp to force new name
+  name        = "allow_web_traffic-${timestamp()}"  # Use timestamp to force a new name if recreated
   description = "Allow inbound HTTP traffic on port 80 and SSH on port 22"
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Open to the world. You can limit this to specific IPs if needed.
+    cidr_blocks = ["0.0.0.0/0"]  # Open to the world. Adjust if specific IPs are required.
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Open to the world. You can limit this to specific IPs if needed.
+    cidr_blocks = ["0.0.0.0/0"]  # Open to the world. Adjust if specific IPs are required.
   }
 
   egress {
@@ -34,14 +33,14 @@ resource "aws_security_group" "allow_web_traffic" {
   }
 }
 
-# Data source to fetch the latest Amazon Linux AMI
-data "aws_ami" "latest_amazon_linux" {
+# Data source to fetch the latest Ubuntu AMI for the specified region
+data "aws_ami" "latest_ubuntu" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"]  # Canonical's AWS account for Ubuntu images
   
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]  # Ubuntu 20.04 LTS
   }
 }
 
@@ -50,18 +49,16 @@ data "aws_key_pair" "existing_key" {
   key_name = "MyNewKeyPair2"  # Replace with your existing key pair name
 }
 
-# Define the EC2 instance and attach the security group, and specify the key pair
+# Define the EC2 instance using the Ubuntu AMI and attach the security group and key pair
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.latest_amazon_linux.id
+  ami           = data.aws_ami.latest_ubuntu.id
   instance_type = "t2.micro"
-  security_groups = [aws_security_group.allow_web_traffic[0].name]  # Attach the security group here
+  security_groups = [aws_security_group.allow_web_traffic.name]  # Attach the security group here
   key_name      = data.aws_key_pair.existing_key.key_name  # Use existing key pair
 
   tags = {
-    Name = "web-instance"
+    Name = "web-instance-ubuntu"
   }
-
-  # Add other necessary configurations like key_name, etc.
 }
 
 # Output the EC2 instance's public IP

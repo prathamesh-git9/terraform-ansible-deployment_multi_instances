@@ -4,7 +4,8 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    use_backend: dnf  # Explicitly specify the backend to use
+    use_backend: dnf4  # Set backend version
+    pkg_mgr: dnf4      # Explicitly specify the package manager
 
   tasks:
     - name: Ensure Python `pip` is installed

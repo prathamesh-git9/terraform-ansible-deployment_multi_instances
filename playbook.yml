@@ -34,6 +34,12 @@
         name: docker
         state: started
         enabled: true
+        # Add user to docker group
+    - name: Add user to docker group
+      user:
+        name: ubuntu  # Use 'ec2-user' for Amazon Linux or 'ubuntu' for Ubuntu-based systems
+        groups: docker
+        append: yes
 
     - name: Ensure Nginx container is running
       community.docker.docker_container:

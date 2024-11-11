@@ -3,6 +3,11 @@
   hosts: web
   become: yes
   tasks:
+    - name: Ensure yum is installed
+      ansible.builtin.package:
+        name: yum
+        state: present
+
     - name: Ensure Python `pip` is installed
       yum:
         name: python3-pip
@@ -32,4 +37,3 @@
         state: started
         ports:
           - "80:80"
-

@@ -53,8 +53,4 @@ The architecture diagram includes:
 - **EC2 Instance**: The virtual server that runs the application.
 - **Output**: Shows the public IP of the instance for access.
 
-## Commands
 
-1. **Initialize Terraform**:
-   ```bash
-   terraform init

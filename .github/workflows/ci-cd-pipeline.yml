@@ -22,7 +22,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Install Docker if not already installed (optional step)
+      # Remove existing Docker and containerd dependencies if any
+      - name: Remove existing Docker and containerd dependencies
+        run: |
+          sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc containerd.io
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf /var/lib/docker
+          sudo rm -rf /var/lib/containerd
+          sudo rm -rf /etc/docker
+          sudo rm -rf /etc/containerd
+
+      # Install Docker using the official convenience script
       - name: Install Docker using the official convenience script
         run: |
           curl -fsSL https://get.docker.com -o get-docker.sh
@@ -52,17 +63,21 @@ jobs:
 
           # Update Ansible inventory.ini with EC2 public IP
           echo "[all]" > inventory.ini
-          echo "web ansible_host=$EC2_PUBLIC_IP ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_python_interpreter=/usr/bin/python3" >> inventory.ini
+          echo "web ansible_host=$EC2_PUBLIC_IP ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=${{ secrets.EC2_SSH_KEY }}" >> inventory.ini
 
           # Disable strict host key checking in SSH config
           mkdir -p ~/.ssh
           echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
 
       # Add the private SSH key from GitHub secrets
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+      # - name: Add SSH key
+      #   uses: webfactory/ssh-agent@v0.5.3
+      #   with:
+      #     ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+      - name: Set up SSH private key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > my-key-pair.pem
+          chmod 600 my-key-pair.pem  # Set permissions to read-only for the owner
 
       # Run the Ansible playbook with the correct Python interpreter and ensure the correct package manager
       - name: Run Ansible playbook

@@ -41,15 +41,20 @@
         groups: docker
         append: yes
 
-    - name: Copy index.html to the server
-      copy:
-        src: ./index.html
-        dest: /var/www/html/index.html
-        owner: www-data
-        group: www-data
-        mode: '0644'
+# Create a directory on the host for the Nginx content
+    - name: Create a directory for index.html
+      file:
+        path: /home/ubuntu/nginx-html
+        state: directory
 
-    - name: Ensure Nginx container is running
+    # Copy index.html from the local machine (adjust path if necessary)
+    - name: Copy index.html to Nginx directory
+      copy:
+        src: ./index.html  # Path to your local index.html file
+        dest: /home/ubuntu/nginx-html/index.html
+
+    # Run Nginx container with the custom index.html file
+    - name: Run Nginx container with custom index.html
       community.docker.docker_container:
         name: nginx
         image: nginx
@@ -57,4 +62,4 @@
         ports:
           - "80:80"
         volumes:
-          - /var/www/html:/usr/share/nginx/html
+          - /home/ubuntu/nginx-html:/usr/share/nginx/html:ro  # Mount the local directory to Nginx HTML directory

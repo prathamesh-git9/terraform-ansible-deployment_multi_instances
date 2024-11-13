@@ -1,6 +1,6 @@
 ---
 - name: Set up Docker and Nginx container
-  hosts: web
+  hosts: all  # Apply to any hosts specified in the command
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -37,7 +37,7 @@
 
     - name: Add user to Docker group
       ansible.builtin.user:
-        name: ubuntu  # Use 'ec2-user' for Amazon Linux or 'ubuntu' for Ubuntu-based systems
+        name: ubuntu  # Adjust to your instance's user if different
         groups: docker
         append: yes
 

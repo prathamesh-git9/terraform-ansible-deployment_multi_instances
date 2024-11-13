@@ -64,7 +64,7 @@ jobs:
 
       # Add a wait time to ensure EC2 instance is ready
       - name: Wait for EC2 instance to be ready
-        run: sleep 300
+        run: sleep 150
 
       # Run the Ansible playbook with inline inventory using the retrieved EC2 IP
       - name: Run Ansible playbook

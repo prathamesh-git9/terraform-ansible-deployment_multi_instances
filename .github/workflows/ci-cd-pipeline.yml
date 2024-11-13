@@ -62,6 +62,10 @@ jobs:
           mkdir -p ~/.ssh  # Ensure the .ssh directory exists
           echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
 
+      # Add a wait time to ensure EC2 instance is ready
+      - name: Wait for EC2 instance to be ready
+        run: sleep 300
+
       # Run the Ansible playbook with inline inventory using the retrieved EC2 IP
       - name: Run Ansible playbook
         run: |
@@ -70,5 +74,4 @@ jobs:
             -e "ansible_user=ubuntu" \
             -e "ansible_host=${{ env.EC2_PUBLIC_IP }}" \
             -e "ansible_ssh_private_key_file=my-key-pair.pem" \
-            -e "ansible_python_interpreter=/usr/bin/python3" \
-            -e "use_backend=dnf4"
+            -e "ansible_python_interpreter=/usr/bin/python3"

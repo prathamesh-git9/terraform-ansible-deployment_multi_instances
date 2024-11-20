@@ -52,5 +52,6 @@ The architecture diagram includes:
 - **Ubuntu AMI**: The operating system used for the EC2 instance.
 - **EC2 Instance**: The virtual server that runs the application.
 - **Output**: Shows the public IP of the instance for access.
+The end
 
 

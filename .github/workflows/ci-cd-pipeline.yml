@@ -45,7 +45,8 @@ jobs:
 
       - name: Retrieve EC2 Public IPs
         id: ec2_ips
-        run: echo "EC2_PUBLIC_IPS=$(terraform output -json ec2_public_ips)" >> $GITHUB_ENV
+        run: |
+          echo 'EC2_PUBLIC_IPS=$(terraform output -json ec2_public_ips)' >> $GITHUB_ENV
 
       - name: Set up SSH private key
         run: |
@@ -59,7 +60,7 @@ jobs:
 
       - name: Run Ansible playbook on each instance
         run: |
-          EC2_IPS=$(echo "${{ env.EC2_PUBLIC_IPS }}" | jq -r '.[]')
+          EC2_IPS=$(echo ${{ env.EC2_PUBLIC_IPS }} | jq -r '.[]')
           for IP in $EC2_IPS; do
             ansible-playbook playbook.yml \
               -i "${IP}," \

@@ -64,5 +64,5 @@ output "ec2_public_ips" {
 
 variable "instance_count" {
   description = "Number of instances to create"
-  default     = 5
+  default     = 1
 }
